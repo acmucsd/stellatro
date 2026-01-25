@@ -12,3 +12,8 @@ src/
 bots/
 
 - bot.py: an example bot
+
+## TODO Refactoring:
+
+- Jokers should consider the entire hand of the player
+- Jokers should have three separate phases --> pre card scoring, card scoring, post card scoring
