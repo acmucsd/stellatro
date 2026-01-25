@@ -1,6 +1,20 @@
 from typing import List
 from card import RANKS, SUITS, Card
 from collections import Counter
+from enum import Enum
+
+
+class HandType(Enum):
+    HIGH_CARD = 1
+    PAIR = 2
+    TWO_PAIR = 3
+    THREE_OF_A_KIND = 4
+    STRAIGHT = 5
+    FLUSH = 6
+    FULL_HOUSE = 7
+    FOUR_OF_A_KIND = 8
+    STRAIGHT_FLUSH = 9
+
 
 class Checker:
     def __init__(self, hand: List[Card]):
@@ -17,35 +31,72 @@ class Checker:
         # wheel: A,2,3,4,5
         return uniq == [2, 3, 4, 5, 14]
 
-    def check(self) -> str:
+    def check(self) -> HandType:
         """
         Given 5 cards, return hand name.
         """
         if len(self.hand) != 5:
             raise ValueError("Hand must contain exactly 5 cards to classify.")
 
-        ranks = [c.rank for c in self.hand]
-        suits = [c.suit for c in self.hand]
+        # for now, each card should only have one rank and one suit
+        ranks = [next(iter(c.ranks)) for c in self.hand]
+        suits = [next(iter(c.suits)) for c in self.hand]
+
+        # rank scoring
         rank_counts = Counter(ranks)
         counts = sorted(rank_counts.values(), reverse=True)
 
         flush = len(set(suits)) == 1
         straight = self.is_straight(ranks)
 
+        hand_type = HandType.HIGH_CARD
+
         if straight and flush:
-            return "Straight Flush"
+            hand_type = HandType.STRAIGHT_FLUSH
+            # score all cards
+            for c in self.hand:
+                c.scored = True
         if counts == [4, 1]:
-            return "Four of a Kind"
+            hand_type = HandType.FOUR_OF_A_KIND
+            # score four cards
+            most_common_rank = rank_counts.most_common(1)[0][0]
+            for c in self.hand:
+                if next(iter(c.ranks)) == most_common_rank:
+                    c.scored = True
         if counts == [3, 2]:
-            return "Full House"
+            hand_type = HandType.FULL_HOUSE
+            # score all cards
+            for c in self.hand:
+                c.scored = True
         if flush:
-            return "Flush"
+            hand_type = HandType.FLUSH
+            # score all cards
+            for c in self.hand:
+                c.scored = True
         if straight:
-            return "Straight"
+            hand_type = HandType.STRAIGHT
+            # score all cards
+            for c in self.hand:
+                c.scored = True
         if counts == [3, 1, 1]:
-            return "Three of a Kind"
+            hand_type = HandType.THREE_OF_A_KIND
+            # score three cards
+            most_common_rank = rank_counts.most_common(1)[0][0]
+            for c in self.hand:
+                if next(iter(c.ranks)) == most_common_rank:
+                    c.scored = True
         if counts == [2, 2, 1]:
-            return "Two Pair"
+            hand_type = HandType.TWO_PAIR
+            # score four cards
+            pairs = [rank for rank, count in rank_counts.items() if count == 2]
+            for c in self.hand:
+                if next(iter(c.ranks)) in pairs:
+                    c.scored = True
         if counts == [2, 1, 1, 1]:
-            return "Pair"
-        return "High Card"
+            hand_type = HandType.PAIR
+            # score two cards
+            pair_rank = rank_counts.most_common(1)[0][0]
+            for c in self.hand:
+                if next(iter(c.ranks)) == pair_rank:
+                    c.scored = True
+        return hand_type
