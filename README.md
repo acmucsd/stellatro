@@ -15,5 +15,6 @@ bots/
 
 ## TODO Refactoring:
 
-- Jokers should consider the entire hand of the player
-- Jokers should have three separate phases --> pre card scoring, card scoring, post card scoring
+- Jokers should consider the entire hand of the player [DONE]
+- Jokers should have three separate phases --> pre card scoring, card scoring, post card scoring [DONE]
+- Game logic should be firmly separated from bot logic, i.e. there should be an interface for game playing and game playing only

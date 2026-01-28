@@ -34,7 +34,8 @@ class Rank(Enum):
 class Card:
     ranks: set[int]
     suits: set[str]
-    scored: bool = False
+    scored: bool = True
+    num_triggers = 1
 
     def __init__(self, rank: int, suit: str):
         # Initialize as sets using curly braces
@@ -47,6 +48,9 @@ class Card:
 
     def add_rank(self, rank: int):
         self.ranks.add(rank)
+
+    def add_trigger(self):
+        self.num_triggers += 1
 
 
 class Deck:
