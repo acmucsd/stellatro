@@ -1,8 +1,13 @@
 # include the main logic of the game
+from enum import Enum
 from bots import bot
 from src.jokers import *
 from src.card import Card, Deck
 from src.checker import Checker
+
+JOKER_POOL_SIZE = 15
+JOKER_HAND_SIZE = 5
+PLAYER_CARDS = 10
 
 HAND_SCORES = {
     "High Card": (10, 1),
@@ -17,12 +22,24 @@ HAND_SCORES = {
 }
 
 
+class Phase(Enum):
+    DRAFT = 1
+    PLAY = 2
+
+
+class PlayerTurn(Enum):
+    PLAYER1 = 1
+    PLAYER2 = 2
+
+
 class Game:
     def __init__(self, player1, player2):
         self.player1 = player1
         self.player2 = player2
         self.player1_score = 0
         self.player2_score = 0
+        self.phase = Phase.DRAFT
+        self.jokers = []
 
     def evaluate_hand(self, hand: List[Card], jokers: List[Joker]) -> int:
 
@@ -58,13 +75,17 @@ class Game:
 
         return chips * mult
 
-    def play(self):
+    def start_round(self):
+        # start the game
+        self.phase = Phase.DRAFT
         print("Game started between Player 1 and Player 2")
         # Placeholder for game logic
+
         # 1. generate deck for both players
         game_deck = Deck()
         p1_deck = game_deck.draw(10)
         p2_deck = game_deck.draw(10)
+
         # 2. generate jokers
         jokers = generate_jokers()
 
@@ -99,4 +120,4 @@ def main():
 
     # Start the game
     game = Game(player1, player2)
-    game.play()
+    game.start_round()
