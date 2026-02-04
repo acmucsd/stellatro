@@ -1,3 +1,4 @@
+import random
 from card import Card
 from typing import List, Tuple
 from checker import HandType
@@ -27,7 +28,7 @@ class Joker:
         return chips, mult
 
     def __str__(self) -> str:
-        return self.name
+        return self.name + ": " + self.description
 
 
 class RegularJoker(Joker):
@@ -89,7 +90,7 @@ class TripletMultBoost(Joker):
         return chips, mult
 
 
-def TwoPairMultBoost(Joker):
+class TwoPairMultBoost(Joker):
     name = "Cheeky Joker"
     description = "Boost multiplier by 4 if the hand includes Two Pair."
 
@@ -105,7 +106,7 @@ def TwoPairMultBoost(Joker):
         return chips, mult
 
 
-def StraightMultBoost(Joker):
+class StraightMultBoost(Joker):
     name = "Witty Joker"
     description = "Boost multiplier by 6 if the hand includes Straight."
 
@@ -120,7 +121,7 @@ def StraightMultBoost(Joker):
         return chips, mult
 
 
-def FlushMultBoost(Joker):
+class FlushMultBoost(Joker):
     name = "Daring Joker"
     description = "Boost multiplier by 7 if the hand includes Flush."
 
@@ -135,7 +136,7 @@ def FlushMultBoost(Joker):
         return chips, mult
 
 
-def TripletChipBoost(Joker):
+class TripletChipBoost(Joker):
     name = "Merry Joker"
     description = "Add 15 chips if the hand includes Three of a Kind."
 
@@ -151,7 +152,7 @@ def TripletChipBoost(Joker):
         return chips, mult
 
 
-def TwoPairChipBoost(Joker):
+class TwoPairChipBoost(Joker):
     name = "Jovial Joker"
     description = "Add 12 chips if the hand includes Two Pair."
 
@@ -167,7 +168,7 @@ def TwoPairChipBoost(Joker):
         return chips, mult
 
 
-def StraightChipBoost(Joker):
+class StraightChipBoost(Joker):
     name = "Lively Joker"
     description = "Add 20 chips if the hand includes Straight."
 
@@ -182,7 +183,7 @@ def StraightChipBoost(Joker):
         return chips, mult
 
 
-def FlushChipBoost(Joker):
+class FlushChipBoost(Joker):
     name = "Vibrant Joker"
     description = "Add 25 chips if the hand includes Flush."
 
@@ -197,7 +198,7 @@ def FlushChipBoost(Joker):
         return chips, mult
 
 
-def DiamondMultBoost(Joker):
+class DiamondMultBoost(Joker):
     name = "Diamond Joker"
     description = "Played cards with Diamond suit boost multiplier by 2."
 
@@ -209,7 +210,7 @@ def DiamondMultBoost(Joker):
         return chips, mult
 
 
-def HeartMultBoost(Joker):
+class HeartMultBoost(Joker):
     name = "Heart Joker"
     description = "Played cards with Heart suit boost multiplier by 2."
 
@@ -221,7 +222,7 @@ def HeartMultBoost(Joker):
         return chips, mult
 
 
-def ClubMultBoost(Joker):
+class ClubMultBoost(Joker):
     name = "Club Joker"
     description = "Played cards with Club suit boost multiplier by 2."
 
@@ -233,7 +234,7 @@ def ClubMultBoost(Joker):
         return chips, mult
 
 
-def SpadeMultBoost(Joker):
+class SpadeMultBoost(Joker):
     name = "Spade Joker"
     description = "Played cards with Spade suit boost multiplier by 2."
 
@@ -245,7 +246,7 @@ def SpadeMultBoost(Joker):
         return chips, mult
 
 
-def generate_jokers() -> List[Joker]:
+def generate_jokers(num_jokers: int) -> List[Joker]:
     # For simplicity, return all jokers; in a real game, this could be randomized
     ALL_JOKERS = [
         PairMultBoost(),
@@ -260,4 +261,10 @@ def generate_jokers() -> List[Joker]:
         ClubMultBoost(),
         SpadeMultBoost(),
     ]
-    return ALL_JOKERS
+
+    toReturn = []
+    # shuffle
+    random.shuffle(ALL_JOKERS)
+    for i in range(num_jokers):
+        toReturn.append(ALL_JOKERS[i % len(ALL_JOKERS)])
+    return toReturn

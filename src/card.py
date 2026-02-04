@@ -1,5 +1,5 @@
 from typing import List
-from random import random
+import random
 from dataclasses import dataclass
 from enum import Enum
 
@@ -32,22 +32,19 @@ class Rank(Enum):
 
 
 class Card:
-    ranks: set[int]
+    rank: int
     suits: set[str]
     scored: bool = True
     num_triggers = 1
 
     def __init__(self, rank: int, suit: str):
         # Initialize as sets using curly braces
-        self.ranks = {rank}
+        self.rank = rank
         self.suits = {suit}
 
     def add_suit(self, suit: str):
         # Use .add() for sets
         self.suits.add(suit)
-
-    def add_rank(self, rank: int):
-        self.ranks.add(rank)
 
     def add_trigger(self):
         self.num_triggers += 1
