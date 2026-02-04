@@ -1,11 +1,7 @@
 from typing import List
-from random import random
+import random
 from dataclasses import dataclass
 from enum import Enum
-
-RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]  # 11=J,12=Q,13=K,14=A
-SUITS = ["diamond", "heart", "club", "spade"]
-RANK_TO_STR = {11: "J", 12: "Q", 13: "K", 14: "A"}
 
 
 class Suit(Enum):
@@ -31,26 +27,34 @@ class Rank(Enum):
     ACE = 14
 
 
+RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]  # 11=J,12=Q,13=K,14=A
+SUITS = [Suit.DIAMOND, Suit.HEART, Suit.CLUB, Suit.SPADE]
+RANK_TO_STR = {11: "J", 12: "Q", 13: "K", 14: "A"}
+
+
 class Card:
-    ranks: set[int]
-    suits: set[str]
+    rank: int
+    suits: set[Suit]
     scored: bool = True
     num_triggers = 1
 
-    def __init__(self, rank: int, suit: str):
+    def __init__(self, rank: int, suit: Suit):
         # Initialize as sets using curly braces
-        self.ranks = {rank}
+        self.rank = rank
         self.suits = {suit}
 
-    def add_suit(self, suit: str):
+    def add_suit(self, suit: Suit):
         # Use .add() for sets
         self.suits.add(suit)
 
-    def add_rank(self, rank: int):
-        self.ranks.add(rank)
-
     def add_trigger(self):
         self.num_triggers += 1
+
+    def __str__(self):
+        rank_str = RANK_TO_STR.get(self.rank, str(self.rank))
+        suits_list = sorted([s.value for s in self.suits])
+        suits_str = ", ".join(suits_list)
+        return f"{rank_str} of {suits_str}"
 
 
 class Deck:

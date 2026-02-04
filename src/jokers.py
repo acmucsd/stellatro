@@ -1,3 +1,4 @@
+import random
 from card import Card
 from typing import List, Tuple
 from checker import HandType
@@ -29,7 +30,7 @@ class Joker:
         return chips, mult
 
     def __str__(self) -> str:
-        return self.name
+        return self.name + ": " + self.description
 
 
 class RegularJoker(Joker):
@@ -47,11 +48,11 @@ class PairMultBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Pair",
-            "Two Pair",
-            "Three of a Kind",
-            "Full House",
-            "Four of a Kind",
+            HandType.PAIR,
+            HandType.TWO_PAIR,
+            HandType.THREE_OF_A_KIND,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
         }:
             return chips, mult + 3
         return chips, mult
@@ -65,11 +66,11 @@ class PairChipBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Pair",
-            "Two Pair",
-            "Three of a Kind",
-            "Full House",
-            "Four of a Kind",
+            HandType.PAIR,
+            HandType.TWO_PAIR,
+            HandType.THREE_OF_A_KIND,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
         }:
             return chips + 10, mult
         return chips, mult
@@ -83,15 +84,15 @@ class TripletMultBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Three of a Kind",
-            "Full House",
-            "Four of a Kind",
+            HandType.THREE_OF_A_KIND,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
         }:
             return chips, mult + 5
         return chips, mult
 
 
-def TwoPairMultBoost(Joker):
+class TwoPairMultBoost(Joker):
     name = "Cheeky Joker"
     description = "Boost multiplier by 4 if the hand includes Two Pair."
 
@@ -99,15 +100,15 @@ def TwoPairMultBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Two Pair",
-            "Full House",
-            "Four of a Kind",
+            HandType.TWO_PAIR,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
         }:
             return chips, mult + 4
         return chips, mult
 
 
-def StraightMultBoost(Joker):
+class StraightMultBoost(Joker):
     name = "Witty Joker"
     description = "Boost multiplier by 6 if the hand includes Straight."
 
@@ -115,14 +116,14 @@ def StraightMultBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Straight",
-            "Straight Flush",
+            HandType.STRAIGHT,
+            HandType.STRAIGHT_FLUSH,
         }:
             return chips, mult + 6
         return chips, mult
 
 
-def FlushMultBoost(Joker):
+class FlushMultBoost(Joker):
     name = "Daring Joker"
     description = "Boost multiplier by 7 if the hand includes Flush."
 
@@ -130,14 +131,14 @@ def FlushMultBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Flush",
-            "Straight Flush",
+            HandType.FLUSH,
+            HandType.STRAIGHT_FLUSH,
         }:
             return chips, mult + 7
         return chips, mult
 
 
-def TripletChipBoost(Joker):
+class TripletChipBoost(Joker):
     name = "Merry Joker"
     description = "Add 15 chips if the hand includes Three of a Kind."
 
@@ -145,15 +146,15 @@ def TripletChipBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Three of a Kind",
-            "Full House",
-            "Four of a Kind",
+            HandType.THREE_OF_A_KIND,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
         }:
             return chips + 15, mult
         return chips, mult
 
 
-def TwoPairChipBoost(Joker):
+class TwoPairChipBoost(Joker):
     name = "Jovial Joker"
     description = "Add 12 chips if the hand includes Two Pair."
 
@@ -161,15 +162,15 @@ def TwoPairChipBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Two Pair",
-            "Full House",
-            "Four of a Kind",
+            HandType.TWO_PAIR,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
         }:
             return chips + 12, mult
         return chips, mult
 
 
-def StraightChipBoost(Joker):
+class StraightChipBoost(Joker):
     name = "Lively Joker"
     description = "Add 20 chips if the hand includes Straight."
 
@@ -177,14 +178,14 @@ def StraightChipBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Straight",
-            "Straight Flush",
+            HandType.STRAIGHT,
+            HandType.STRAIGHT_FLUSH,
         }:
             return chips + 20, mult
         return chips, mult
 
 
-def FlushChipBoost(Joker):
+class FlushChipBoost(Joker):
     name = "Vibrant Joker"
     description = "Add 25 chips if the hand includes Flush."
 
@@ -192,14 +193,14 @@ def FlushChipBoost(Joker):
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
         if hand_type in {
-            "Flush",
-            "Straight Flush",
+            HandType.FLUSH,
+            HandType.STRAIGHT_FLUSH,
         }:
             return chips + 25, mult
         return chips, mult
 
 
-def DiamondMultBoost(Joker):
+class DiamondMultBoost(Joker):
     name = "Diamond Joker"
     description = "Played cards with Diamond suit boost multiplier by 2."
 
@@ -211,7 +212,7 @@ def DiamondMultBoost(Joker):
         return chips, mult
 
 
-def HeartMultBoost(Joker):
+class HeartMultBoost(Joker):
     name = "Heart Joker"
     description = "Played cards with Heart suit boost multiplier by 2."
 
@@ -223,7 +224,7 @@ def HeartMultBoost(Joker):
         return chips, mult
 
 
-def ClubMultBoost(Joker):
+class ClubMultBoost(Joker):
     name = "Club Joker"
     description = "Played cards with Club suit boost multiplier by 2."
 
@@ -235,7 +236,7 @@ def ClubMultBoost(Joker):
         return chips, mult
 
 
-def SpadeMultBoost(Joker):
+class SpadeMultBoost(Joker):
     name = "Spade Joker"
     description = "Played cards with Spade suit boost multiplier by 2."
 
@@ -245,67 +246,88 @@ def SpadeMultBoost(Joker):
         if suit == Suit.SPADE:
             return chips, mult + 2
         return chips, mult
-class Superposition(Joker):
-    name = "Superposition (+20 Mult if the hand contains an Ace and a Straight)"
-    def post_card_phase(self, chips, mult, hand):
-        has_ace = False
-        has_straight = self.can_form_straight(hand)
-        for card in hand:
-            if 14 in card.ranks:
-                has_ace = True
-        return chips, mult + 20 if has_ace and has_straight else chips,mult
-    def can_form_straight(self, hand: List[Card]) -> bool:
-        rank_choices = [list(card.ranks) for card in hand]
-        for combination in product(*rank_choices):
-            checker = Checker(list(combination))
-            if checker.is_straight():
-                return True
-        return False
-class Cavendish(Joker):
-    name = "Cavendish (1 in 1000 chance for x3 Mult)"
-    def post_card_phase(self, chips, mult, hand):
-        rand_int = randint(1,1000)
-        return chips, mult * 3 if rand_int == 1 else chips,mult
-class SquareJoker(Joker):
-    name = "Square Joker (This joker gains +5 chips for each hand played)"
-    chips = 0
-    def post_card_phase(self, chips, mult, hand):
-        self.chips += 5
-        return chips + self.chips, mult
-class Obelisk(Joker):
-    name = "Obelisk (This joker gains x0.2 Mult per consecutive hand played without playing your most played poker hand)"
-    poker_hands = {}
-    current_mult = 0
-    def post_card_phase(self, chips, mult, hand):
-        highestCount = 0
-        highestHand = None
-        for handType, count in self.poker_hands.items():
-            if count > highestCount:
-                highestCount = count
-                highestHand = handType
-        
-        checker = Checker(hand)
-        hand_type = checker.check()
-        if hand_type not in self.poker_hands:
-            self.poker_hands[hand_type] = 1
-        else:
-            self.poker_hands[hand_type] += 1
-        if highestHand != hand_type or highestCount == 0:
-            self.current_mult += 0.2
-        return chips, mult * (1 + self.current_mult)
-class Hiker(Joker):
-    name = "Hiker (Every played card is granted +5 chips when scored)"
-    card_table = {}
-    def apply_card_phase(self, chips, mult, rank, suit):
-        if (rank,suit) in self.card_table:
-            self.card_table[(rank,suit)] += 5
-        else:
-            self.card_table[(rank,suit)] = 5
-        return chips + self.card_table[(rank,suit)], mult
-            
-        
 
-def generate_jokers() -> List[Joker]:
+
+# class Superposition(Joker):
+#     name = "Superposition"
+#     description = "(The Ace can represent any rank to form a Straight)"
+
+#     def post_card_phase(self, chips, mult, hand):
+#         has_ace = False
+#         has_straight = self.can_form_straight(hand)
+#         for card in hand:
+#             if 14 in card.ranks:
+#                 has_ace = True
+#         return chips, mult + 20 if has_ace and has_straight else chips, mult
+
+#     def can_form_straight(self, hand: List[Card]) -> bool:
+#         rank_choices = [list(card.ranks) for card in hand]
+#         for combination in product(*rank_choices):
+#             checker = Checker(list(combination))
+#             if checker.is_straight():
+#                 return True
+#         return False
+
+
+# class Cavendish(Joker):
+#     name = "Cavendish"
+#     description = "(1 in 1000 chance for x3 Mult)"
+
+#     def post_card_phase(self, chips, mult, hand):
+#         rand_int = randint(1, 1000)
+#         return chips, mult * 3 if rand_int == 1 else chips, mult
+
+
+# class SquareJoker(Joker):
+#     name = "Square Joker"
+#     description = "(This joker gains +5 chips for each hand played)"
+#     chips = 0
+
+#     def post_card_phase(self, chips, mult, hand):
+#         self.chips += 5
+#         return chips + self.chips, mult
+
+
+# class Obelisk(Joker):
+#     name = "Obelisk"
+#     description = "(This joker gains x0.2 Mult per consecutive hand played without playing your most played poker hand)"
+#     poker_hands = {}
+#     current_mult = 0
+
+#     def post_card_phase(self, chips, mult, hand):
+#         highestCount = 0
+#         highestHand = None
+#         for handType, count in self.poker_hands.items():
+#             if count > highestCount:
+#                 highestCount = count
+#                 highestHand = handType
+
+#         checker = Checker(hand)
+#         hand_type = checker.check()
+#         if hand_type not in self.poker_hands:
+#             self.poker_hands[hand_type] = 1
+#         else:
+#             self.poker_hands[hand_type] += 1
+#         if highestHand != hand_type or highestCount == 0:
+#             self.current_mult += 0.2
+#         return chips, mult * (1 + self.current_mult)
+
+
+# class Hiker(Joker):
+#     name = "Hiker"
+#     description = "(Every played card is granted +5 chips when scored)"
+
+#     card_table = {}
+
+#     def apply_card_phase(self, chips, mult, rank, suit):
+#         if (rank, suit) in self.card_table:
+#             self.card_table[(rank, suit)] += 5
+#         else:
+#             self.card_table[(rank, suit)] = 5
+#         return chips + self.card_table[(rank, suit)], mult
+
+
+def generate_jokers(num_jokers: int) -> List[Joker]:
     # For simplicity, return all jokers; in a real game, this could be randomized
     ALL_JOKERS = [
         PairMultBoost(),
@@ -319,10 +341,16 @@ def generate_jokers() -> List[Joker]:
         HeartMultBoost(),
         ClubMultBoost(),
         SpadeMultBoost(),
-        Superposition(),
-        Cavendish(),
-        SquareJoker(),
-        Obelisk(),
-        Hiker()
+        # Superposition(),
+        # Cavendish(),
+        # SquareJoker(),
+        # Obelisk(),
+        # Hiker(),
     ]
-    return ALL_JOKERS
+
+    toReturn = []
+    # shuffle
+    random.shuffle(ALL_JOKERS)
+    for i in range(num_jokers):
+        toReturn.append(ALL_JOKERS[i % len(ALL_JOKERS)])
+    return toReturn
