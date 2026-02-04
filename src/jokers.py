@@ -4,6 +4,8 @@ from typing import List, Tuple
 from checker import HandType
 from checker import Checker
 from card import Rank, Suit
+from itertools import product
+from random import randint
 
 
 # Base class for jokers
@@ -244,7 +246,65 @@ class SpadeMultBoost(Joker):
         if suit == Suit.SPADE:
             return chips, mult + 2
         return chips, mult
-
+class Superposition(Joker):
+    name = "Superposition (+20 Mult if the hand contains an Ace and a Straight)"
+    def post_card_phase(self, chips, mult, hand):
+        has_ace = False
+        has_straight = self.can_form_straight(hand)
+        for card in hand:
+            if 14 in card.ranks:
+                has_ace = True
+        return chips, mult + 20 if has_ace and has_straight else chips,mult
+    def can_form_straight(self, hand: List[Card]) -> bool:
+        rank_choices = [list(card.ranks) for card in hand]
+        for combination in product(*rank_choices):
+            checker = Checker(list(combination))
+            if checker.is_straight():
+                return True
+        return False
+class Cavendish(Joker):
+    name = "Cavendish (1 in 1000 chance for x3 Mult)"
+    def post_card_phase(self, chips, mult, hand):
+        rand_int = randint(1,1000)
+        return chips, mult * 3 if rand_int == 1 else chips,mult
+class SquareJoker(Joker):
+    name = "Square Joker (This joker gains +5 chips for each hand played)"
+    chips = 0
+    def post_card_phase(self, chips, mult, hand):
+        self.chips += 5
+        return chips + self.chips, mult
+class Obelisk(Joker):
+    name = "Obelisk (This joker gains x0.2 Mult per consecutive hand played without playing your most played poker hand)"
+    poker_hands = {}
+    current_mult = 0
+    def post_card_phase(self, chips, mult, hand):
+        highestCount = 0
+        highestHand = None
+        for handType, count in self.poker_hands.items():
+            if count > highestCount:
+                highestCount = count
+                highestHand = handType
+        
+        checker = Checker(hand)
+        hand_type = checker.check()
+        if hand_type not in self.poker_hands:
+            self.poker_hands[hand_type] = 1
+        else:
+            self.poker_hands[hand_type] += 1
+        if highestHand != hand_type or highestCount == 0:
+            self.current_mult += 0.2
+        return chips, mult * (1 + self.current_mult)
+class Hiker(Joker):
+    name = "Hiker (Every played card is granted +5 chips when scored)"
+    card_table = {}
+    def apply_card_phase(self, chips, mult, rank, suit):
+        if (rank,suit) in self.card_table:
+            self.card_table[(rank,suit)] += 5
+        else:
+            self.card_table[(rank,suit)] = 5
+        return chips + self.card_table[(rank,suit)], mult
+            
+        
 
 def generate_jokers(num_jokers: int) -> List[Joker]:
     # For simplicity, return all jokers; in a real game, this could be randomized
@@ -260,6 +320,11 @@ def generate_jokers(num_jokers: int) -> List[Joker]:
         HeartMultBoost(),
         ClubMultBoost(),
         SpadeMultBoost(),
+        Superposition(),
+        Cavendish(),
+        SquareJoker(),
+        Obelisk(),
+        Hiker()
     ]
 
     toReturn = []
