@@ -3,9 +3,10 @@ from enum import Enum
 from jokers import *
 from card import Card, Deck
 from checker import Checker, HandType
+from utils import print_card_list, print_jokers
 
 JOKER_POOL_SIZE = 15
-JOKER_HAND_SIZE = 5
+JOKER_HAND_SIZE = 2
 PLAYER_CARDS = 10
 
 HAND_SCORES = {
@@ -67,6 +68,12 @@ class Game:
         # then, check our hand type so we get our base chips and mult
         checker = Checker(hand)
         hand_type = checker.check()
+
+        # debugging
+        print(hand_type)
+        print_card_list(hand)
+        print_jokers(jokers)
+
         chips, mult = HAND_SCORES.get(hand_type, (0, 0))
         print(chips, mult)
         # apply each card-phase joker
@@ -187,7 +194,7 @@ class Game:
                     print(f"Player {player} provided an out-of-range card index!")
                     return (False, self.get_game_state())
 
-            # All checks done, allocate cards for correct playe
+            # All checks done, allocate cards for correct player
             if player == 1:
                 played_hand = [self.p1hand[i] for i in hand_list]
                 round_score = self.evaluate_hand(played_hand, self.p1jokers)

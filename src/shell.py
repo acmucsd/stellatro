@@ -1,4 +1,5 @@
 from game import Game, Phase, PlayerTurn, GameState
+from utils import print_card_list, print_jokers
 
 
 def render_state(state: GameState):
@@ -10,10 +11,12 @@ def render_state(state: GameState):
 
     print(f"Your current hand:")
     for i, card in enumerate(state.player1_hand):
-        print(f"[{i}] Rank: {card.rank}, Suits: {', '.join(card.suits)}")
+        # The card's __str__ now handles the Enum conversion automatically
+        print(f"[{i}]: {card}")
+    print()  # newline
     print(f"Your opponent's hand:")
     for i, card in enumerate(state.player2_hand):
-        print(f"[{i}] Rank: {card.rank}, Suits: {', '.join(card.suits)}")
+        print(f"[{i}]: {card}")
 
     if state.phase == Phase.DRAFT:
         print("Available Jokers to pick:")
@@ -21,6 +24,9 @@ def render_state(state: GameState):
             print(f"[{i}] {joker}")  # Assumes your Joker classes have a __str__
 
     elif state.phase == Phase.PLAY:
+        """Print out each joker"""
+        for i, joker in enumerate(state.jokers):
+            print(f"[{i}] {joker}")
         print("Your Hand Indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]")
         # You could add logic here to show actual Card ranks/suits
     print("=" * 30)
