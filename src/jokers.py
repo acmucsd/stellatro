@@ -246,6 +246,29 @@ class SpadeMultBoost(Joker):
         if suit == Suit.SPADE:
             return chips, mult + 2
         return chips, mult
+    
+class SpareTrousers(Joker):
+    name = "Spare Trousers"
+    description = "This joker gains +2 Mult if played hand contains a Two Pair (Currently +0 Mult)"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+        if hand_type in {
+            HandType.TWO_PAIR,
+            HandType.FULL_HOUSE,
+        }:
+            return chips, mult + 2
+        return chips, mult
+    
+class AncientJoker(Joker):
+    name = "Ancient Joker"
+    description = "Each played card with [suit] gives x1.5 Mult when scored. (suit changed at end of round)."
+    
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+        pass # TODO: Implement
 
 
 class PhotoGraphMultBoost(Joker):
