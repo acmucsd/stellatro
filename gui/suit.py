@@ -6,4 +6,5 @@ class Suit(Enum):
     CLUB = "club"
     SPADE = "spade"
 
+SUITS = [Suit.DIAMOND, Suit.HEART, Suit.CLUB, Suit.SPADE]
 

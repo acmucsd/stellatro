@@ -1,6 +1,7 @@
 from enum import Enum
 from rank import Rank
 from suit import Suit
+from typing import Set
 import pygame
 
 
@@ -13,11 +14,20 @@ class CardBackground(Enum):
 
 
 class Card(pygame.sprite.Sprite):
-    def __init__(self, card_background, card_rank, card_suit, front_image, back_image, x=0, y=0):
+    rank : int
+    suits : Set[Suit]
+    scored : bool = False
+    num_triggers : int
+    selected : bool = False
+    
+    def __init__(self, card_background, rank, suit, front_image, back_image, x=0, y=0):
         super().__init__()
         self.card_background = card_background
-        self.card_rank = card_rank
-        self.card_suit = card_suit
+        self.rank = rank
+        self.suits = {suit}
+        self.scored = False
+        self.num_triggers = 1
+        self.selected = False
         
         # Store both versions of the "Final" image
         self.face_up_image = back_image.copy()
@@ -47,7 +57,7 @@ class Card(pygame.sprite.Sprite):
         old_center = self.rect.center
         self.rect = self.image.get_rect(center=old_center)
     
-    def update():
+    def update(self):
         pass
 
         
