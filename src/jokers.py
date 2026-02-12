@@ -261,6 +261,7 @@ class SpareTrousers(Joker):
         if hand_type in {
             HandType.TWO_PAIR,
             HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND
         }:
             self.accumulated_mult += 2
         return chips, mult + self.accumulated_mult
@@ -294,6 +295,21 @@ class WalkieTalkie(Joker):
         if rank == Rank.TEN or rank == Rank.FOUR:
             return chips + 10, mult + 4
         return chips, mult
+    
+class Ramen(Joker):
+    name = "Ramen"
+    description = "X2 Mult, loses X0.01 Mult per card discarded."
+    
+    def __init__(self):
+        self.mult_multiplier = 2.0
+    
+    def post_card_phase(self, chips, mult, hand):
+        return chips, (mult * self.mult_multiplier)
+    
+    def discard(self, num_discarded):
+        """Call this function when cards are discarded"""
+        self.mult_multiplier -= (0.01 * num_discarded)
+        self.mult_multiplier = max(0, self.mult_multiplier)
 
 
 class Ramen(Joker):
