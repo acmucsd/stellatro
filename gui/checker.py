@@ -37,7 +37,8 @@ class Checker:
         """
         if len(self.hand) != 5:
             raise ValueError("Hand must contain exactly 5 cards to classify.")
-
+        for c in self.hand:
+            c.scored = False
         # for now, each card should only have one rank and one suit
         ranks = [c.rank.value for c in self.hand]
         suits = [c.suit for c in self.hand]

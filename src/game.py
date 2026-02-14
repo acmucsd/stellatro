@@ -60,7 +60,8 @@ class Game:
     def evaluate_hand(self, hand: List[Card], jokers: List[Joker]) -> int:
 
         # before we find out what hand we have, apply the pre-phase jokers
-
+        for c in hand:
+            c.scored = False # reset scored status
         # apply each pre-phase joker
         for joker in jokers:
             hand = joker.pre_card_phase(hand)

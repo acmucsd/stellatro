@@ -247,6 +247,16 @@ class SpadeMultBoost(Joker):
             return chips, mult + 2
         return chips, mult
 
+class PhotoGraphMultBoost(Joker):
+    name = "PhotoGraph Joker"
+    description = "First played face card gives X2 Mult when scored"
+    ## How to differentiate face cards? 
+    def apply_card_phase(
+        self, chips: int, mult: int, rank: Rank, suit: Suit
+    ) -> Tuple[int, int]:
+        if rank == 10:
+            return chips, mult * 2
+        return chips, mult
 
 # class Superposition(Joker):
 #     name = "Superposition"
