@@ -247,16 +247,129 @@ class SpadeMultBoost(Joker):
             return chips, mult + 2
         return chips, mult
 
+
 class PhotoGraphMultBoost(Joker):
     name = "PhotoGraph Joker"
     description = "First played face card gives X2 Mult when scored"
-    ## How to differentiate face cards? 
+
+    ## How to differentiate face cards?
     def apply_card_phase(
         self, chips: int, mult: int, rank: Rank, suit: Suit
     ) -> Tuple[int, int]:
         if rank == 10:
             return chips, mult * 2
         return chips, mult
+
+
+class FlowerPot(Joker):
+    name = "Flower Pot"
+    description = "x3 Mult if played hand contains a diamond, heart, spade, and club"
+
+    def post_card_phase(self, chips, mult, hand):
+        has_diamond = False
+        has_heart = False
+        has_club = False
+        has_spade = False
+        for card in hand:
+            if Suit.DIAMOND in card.suits:
+                has_diamond = True
+            if Suit.HEART in card.suits:
+                has_heart = True
+            if Suit.CLUB in card.suits:
+                has_club = True
+            if Suit.SPADE in card.suits:
+                has_spade = True
+        if has_diamond and has_heart and has_club and has_spade:
+            return chips, mult * 3
+        return chips, mult
+
+
+class TheDuo(Joker):
+    name = "The Duo"
+    description = "If hand contains a pair, x2 Mult"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+        if hand_type in {
+            HandType.PAIR,
+            HandType.TWO_PAIR,
+            HandType.THREE_OF_A_KIND,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
+        }:
+            return chips, mult * 2
+        return chips, mult
+
+
+class TheTrio(Joker):
+    name = "The Trio"
+    description = "If hand contains a Three of a Kind, x3 Mult"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+
+        # Includes hands that contain at least 3 of a kind
+        if hand_type in {
+            HandType.THREE_OF_A_KIND,
+            HandType.FULL_HOUSE,
+            HandType.FOUR_OF_A_KIND,
+        }:
+            return chips, mult * 3
+        return chips, mult
+
+
+class TheFamily(Joker):
+    name = "The Family"
+    description = "If hand contains a Four of a Kind, x4 Mult"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+
+        if hand_type in {
+            HandType.FOUR_OF_A_KIND,
+        }:
+            return chips, mult * 4
+        return chips, mult
+
+
+class TheTribe(Joker):
+    name = "The Tribe"
+    description = "If hand contains a Flush, x3 Mult"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+
+        # Includes standard flushes and straight flushes
+        if hand_type in {
+            HandType.FLUSH,
+            HandType.STRAIGHT_FLUSH,
+            HandType.ROYAL_FLUSH,  # Include if your Enum distinguishes Royal Flushes
+        }:
+            return chips, mult * 3
+        return chips, mult
+
+
+class TheOrder(Joker):
+    name = "The Order"
+    description = "If hand contains a Straight, x3 Mult"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+
+        # Includes standard straights and straight flushes
+        if hand_type in {
+            HandType.STRAIGHT,
+            HandType.STRAIGHT_FLUSH,
+            HandType.ROYAL_FLUSH,
+        }:
+            return chips, mult * 3
+        return chips, mult
+
 
 # class Superposition(Joker):
 #     name = "Superposition"
