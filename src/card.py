@@ -32,6 +32,16 @@ SUITS = [Suit.DIAMOND, Suit.HEART, Suit.CLUB, Suit.SPADE]
 RANK_TO_STR = {11: "J", 12: "Q", 13: "K", 14: "A"}
 
 
+def rank_to_score(rank: int) -> int:
+    if 2 <= rank <= 10:
+        return rank
+    if 11 <= rank <= 13:
+        return 10
+    if rank == 14:
+        return 11
+    raise ValueError(f"Invalid card rank: {rank}")
+
+
 class Card:
     rank: int
     suits: set[Suit]

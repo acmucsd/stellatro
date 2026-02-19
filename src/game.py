@@ -1,7 +1,7 @@
 # include the main logic of the game
 from enum import Enum
 from jokers import *
-from card import Card, Deck
+from card import Card, Deck, rank_to_score
 from checker import Checker, HandType
 from utils import print_card_list, print_jokers
 
@@ -86,7 +86,7 @@ class Game:
                 # then for each time the card triggers...
                 for _ in range(card.num_triggers):
                     # apply each card-phase joker
-                    chips += card.rank  # Add the proper amount of chips
+                    chips += rank_to_score(card.rank)
                     for joker in jokers:
                         chips, mult = joker.apply_card_phase(
                             chips, mult, card.rank, next(iter(card.suits))

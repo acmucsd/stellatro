@@ -371,6 +371,19 @@ class TheOrder(Joker):
         return chips, mult
 
 
+class TheSingle(Joker):
+    name = "UC Socially Dead"
+    description = "If hand contains only a High Card, x5 Mult"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+
+        if hand_type == HandType.HIGH_CARD:
+            return chips, mult * 5
+        return chips, mult
+
+
 # class Superposition(Joker):
 #     name = "Superposition"
 #     description = "(The Ace can represent any rank to form a Straight)"

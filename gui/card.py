@@ -13,6 +13,16 @@ class CardBackground(Enum):
     WHITE_FRONT="white_front"
 
 
+def rank_to_score(rank: int) -> int:
+    if 2 <= rank <= 10:
+        return rank
+    if 11 <= rank <= 13:
+        return 10
+    if rank == 14:
+        return 11
+    raise ValueError(f"Invalid card rank: {rank}")
+
+
 class Card(pygame.sprite.Sprite):
     rank : int
     suits : Set[Suit]
