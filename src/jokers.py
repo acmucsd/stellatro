@@ -391,8 +391,10 @@ class BitByte(Joker):
     def apply_card_phase(
         self, chips: int, mult: int, rank: Rank, suit: Suit
     ) -> Tuple[int, int]:
-        if rank == 10:
-            return chips, mult * 2
+        if rank in {11, 12, 13}:  # Face cards
+            return chips, mult + 2
+        elif 2 <= rank <= 10:  # Number cards
+            return chips + 8, mult
         return chips, mult
 
 
