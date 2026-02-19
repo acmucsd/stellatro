@@ -384,6 +384,63 @@ class TheSingle(Joker):
         return chips, mult
 
 
+class BitByte(Joker):
+    name = "Bit Byte"
+    description = "Face cards add 2 mult, number cards add 8 chips"
+
+    def apply_card_phase(
+        self, chips: int, mult: int, rank: Rank, suit: Suit
+    ) -> Tuple[int, int]:
+        if rank == 10:
+            return chips, mult * 2
+        return chips, mult
+
+
+class StudentID(Joker):
+    name = "Student ID"
+    description = "If hand contains a single ace and no face cards, +10 mult"
+
+    def post_card_phase(self, chips, mult, hand):
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+
+        has_single_ace = False
+        has_face_card = False
+        for card in hand:
+            if card.rank == 14:  # Ace
+                if has_single_ace:  # More than one ace
+                    return chips, mult
+                has_single_ace = True
+            elif card.rank in {11, 12, 13}:  # Face cards
+                has_face_card = True
+
+        if has_single_ace and not has_face_card:
+            return chips, mult + 10
+        return chips, mult
+
+
+class WebReg(Joker):
+    name = "WebReg"
+    description = "Retrigger each card that has rank <= 8"
+
+    def pre_card_phase(self, hand):
+        for card in hand:
+            if card.rank <= 8:
+                card.add_trigger()
+        return hand
+
+
+class LastLecture(Joker):
+    name = "Last Lecture"
+    description = "Final card gets retriggered 2 extra times"
+
+    def pre_card_phase(self, hand):
+        if hand:
+            hand[-1].add_trigger()
+            hand[-1].add_trigger()
+        return hand
+
+
 # class Superposition(Joker):
 #     name = "Superposition"
 #     description = "(The Ace can represent any rank to form a Straight)"
