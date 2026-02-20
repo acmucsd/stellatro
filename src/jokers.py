@@ -443,6 +443,17 @@ class LastLecture(Joker):
         return hand
 
 
+class DiningHallPrices(Joker):
+    name = "Dining Hall Prices"
+    description = "Cards with rank 2,3,4,5 have their rank increased by 5"
+
+    def pre_card_phase(self, hand):
+        for card in hand:
+            if 2 <= card.rank <= 5:
+                card.rank += 5
+        return hand
+
+
 # class Superposition(Joker):
 #     name = "Superposition"
 #     description = "(The Ace can represent any rank to form a Straight)"
