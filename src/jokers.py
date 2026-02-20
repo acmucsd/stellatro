@@ -532,6 +532,87 @@ class DiningHallPrices(Joker):
 #             self.card_table[(rank, suit)] = 5
 #         return chips + self.card_table[(rank, suit)], mult
 
+class HalfJoker(Joker):
+    name = "Half Joker"
+    description = "Add 20 to multiplier if played hand contains 3 or fewer cards."
+
+    def post_card_phase(
+        self, chips: int, mult: int, hand: List[Card]
+    ) -> Tuple[int, int]:
+        Checker_instance = Checker(hand)
+        hand_type = Checker_instance.check()
+        if hand_type in {
+            HandType.PAIR,
+            HandType.THREE_OF_A_KIND,
+            HandType.HIGH_CARD
+        }:
+            return chips, mult + 20
+        return chips, mult
+    
+# class FourFingers(Joker):
+#     name = "Four Fingers Joker"
+#     description = "All Flushes and Straights can be made with 4 cards."
+
+#     def pre_card_phase(self, hand: List[Card]) -> Tuple[List[Card]]:
+#         """Return (hand) after pre-phase application of joker."""
+#         return hand
+
+#     def post_card_phase(
+#         self, chips: int, mult: int, hand: List[Card]
+#     ) -> Tuple[int, int]:
+#         Checker_instance = Checker(hand)
+#         hand_type = Checker_instance.check()
+#         if hand_type in {
+#             HandType.PAIR,
+#             HandType.THREE_OF_A_KIND,
+#             HandType.HIGH_CARD
+#         }:
+#             return chips, mult + 20
+#         return chips, mult
+
+# class RaisedFist(Joker):
+#     name = "Raised Fist Joker"
+#     description = "Adds double the rank of lowest ranked card held in hand to mult."
+
+#     lowest_rank = 1000000
+
+#     def post_card_phase(
+#         self, chips: int, mult: int, hand: List[Card]
+#     ) -> Tuple[int, int]:
+#         Checker_instance = Checker(hand)
+#         hand_type = Checker_instance.check()
+#         if hand_type in {
+#             HandType.PAIR,
+#             HandType.THREE_OF_A_KIND,
+#             HandType.HIGH_CARD
+#         }:
+#             return chips, mult + 20
+#         return chips, mult
+
+class Fibonacci(Joker):
+    name = "Fibonacci Joker"
+    description = "Each played Ace, 2, 3, 5, or 8 gives +8 Mult when scored."
+
+    def apply_card_phase(
+        self, chips: int, mult: int, rank: Rank, suit: Suit
+    ) -> Tuple[int, int]:
+        mult_add = 0
+        if rank == 14 or rank == 2 or rank == 3 or rank == 5 or rank == 8:
+            return chips, mult + 8
+        return chips, mult
+    
+class ScaryFace(Joker):
+    name = "Scary Face Joker"
+    description = "Each face card gives +10 mult."
+
+    def apply_card_phase(
+        self, chips: int, mult: int, rank: Rank, suit: Suit
+    ) -> Tuple[int, int]:
+        mult_add = 0
+        if rank == 11 or rank == 12 or rank == 13:
+            return chips, mult + 10
+        return chips, mult
+
 
 def generate_jokers(num_jokers: int) -> List[Joker]:
     # For simplicity, return all jokers; in a real game, this could be randomized
@@ -552,6 +633,9 @@ def generate_jokers(num_jokers: int) -> List[Joker]:
         # SquareJoker(),
         # Obelisk(),
         # Hiker(),
+        HalfJoker(),
+        Fibonacci(),
+        ScaryFace(),
     ]
 
     toReturn = []
