@@ -28,6 +28,7 @@ class Checker:
         # normal straight
         if uniq[-1] - uniq[0] == 4:
             return True
+
         # wheel: A,2,3,4,5
         return uniq == [2, 3, 4, 5, 14]
 

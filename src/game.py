@@ -1,6 +1,8 @@
 # include the main logic of the game
 from enum import Enum
-from jokers import *
+from typing import List, Optional, Tuple
+
+from jokers import Joker, generate_jokers
 from card import Card, Deck, rank_to_score
 from checker import Checker, HandType
 from utils import print_card_list, print_jokers
@@ -34,14 +36,23 @@ class PlayerTurn(Enum):
 
 
 class GameState:
-    def __init__(self, phase, p1hand, p2hand, jokers, p1score, p2score, current_turn):
-        self.phase = phase
-        self.player1_hand = p1hand
-        self.player2_hand = p2hand
-        self.jokers = jokers
-        self.player1_score = p1score
-        self.player2_score = p2score
-        self.current_turn = current_turn
+    def __init__(
+        self,
+        phase: Phase,
+        p1hand: List[Card],
+        p2hand: List[Card],
+        jokers: List[Joker],
+        p1score: int,
+        p2score: int,
+        current_turn: Optional[PlayerTurn],
+    ):
+        self.phase: Phase = phase
+        self.player1_hand: List[Card] = p1hand
+        self.player2_hand: List[Card] = p2hand
+        self.jokers: List[Joker] = jokers
+        self.player1_score: int = p1score
+        self.player2_score: int = p2score
+        self.current_turn: Optional[PlayerTurn] = current_turn
 
 
 class Game:
@@ -61,7 +72,7 @@ class Game:
 
         # before we find out what hand we have, apply the pre-phase jokers
         for c in hand:
-            c.scored = False # reset scored status
+            c.scored = False  # reset scored status
         # apply each pre-phase joker
         for joker in jokers:
             hand = joker.pre_card_phase(hand)
@@ -129,8 +140,12 @@ class Game:
         )
 
     def step(
-        self, player: int, action: int = None, hand_list: List[int] = None
+        self, player: int, action: Optional[int] = None, hand_list: Optional[List[int]] = None
     ) -> Tuple:
+        if player not in (1, 2):
+            print(f"Invalid player id: {player}")
+            return (False, self.get_game_state())
+
         # check if the player is correct in the first place
         if (player == 1 and self.current_turn != PlayerTurn.PLAYER1) or (
             player == 2 and self.current_turn != PlayerTurn.PLAYER2
@@ -144,6 +159,10 @@ class Game:
             # Error check
             if action is None:
                 print(f"Player {player} did not provide an action!")
+                return (False, self.get_game_state())
+
+            if not isinstance(action, int) or isinstance(action, bool):
+                print(f"Player {player} provided a non-integer draft action!")
                 return (False, self.get_game_state())
 
             if action < 0 or action >= len(self.jokers):
@@ -172,16 +191,27 @@ class Game:
 
         # play phase
         elif self.phase == Phase.PLAY:
-            # conditions: no duplicates, 1 <= len(hand_list) <= 5, all cards are within range
+            # conditions: no duplicates, exactly 5 cards, all cards are within range
 
             # check if input is valid
             if hand_list is None:
                 print(f"Player {player} did not provide a hand to play!")
                 return (False, self.get_game_state())
 
+            if not isinstance(hand_list, list):
+                print(f"Player {player} provided an invalid hand payload!")
+                return (False, self.get_game_state())
+
             # check if length is valid
-            if len(hand_list) < 1 or len(hand_list) > 5:
+            if len(hand_list) != 5:
                 print(f"Player {player} provided an invalid number of cards!")
+                return (False, self.get_game_state())
+
+            if any(
+                (not isinstance(card_index, int)) or isinstance(card_index, bool)
+                for card_index in hand_list
+            ):
+                print(f"Player {player} provided non-integer card indices!")
                 return (False, self.get_game_state())
 
             # check if duplicates exist
@@ -190,21 +220,34 @@ class Game:
                 return (False, self.get_game_state())
 
             # check if all cards are within range
+            hand_size = len(self.p1hand) if player == 1 else len(self.p2hand)
             for card_index in hand_list:
-                if card_index < 0 or card_index >= PLAYER_CARDS:
+                if (
+                    card_index < 0
+                    or card_index >= PLAYER_CARDS
+                    or card_index >= hand_size
+                ):
                     print(f"Player {player} provided an out-of-range card index!")
                     return (False, self.get_game_state())
 
             # All checks done, allocate cards for correct player
             if player == 1:
                 played_hand = [self.p1hand[i] for i in hand_list]
-                round_score = self.evaluate_hand(played_hand, self.p1jokers)
+                try:
+                    round_score = self.evaluate_hand(played_hand, self.p1jokers)
+                except Exception as exc:
+                    print(f"Player {player} hand evaluation failed: {exc}")
+                    return (False, self.get_game_state())
                 self.player1_score += round_score
                 self.current_turn = PlayerTurn.PLAYER2
                 return (True, self.get_game_state())
             else:
                 played_hand = [self.p2hand[i] for i in hand_list]
-                round_score = self.evaluate_hand(played_hand, self.p2jokers)
+                try:
+                    round_score = self.evaluate_hand(played_hand, self.p2jokers)
+                except Exception as exc:
+                    print(f"Player {player} hand evaluation failed: {exc}")
+                    return (False, self.get_game_state())
                 self.player2_score += round_score
                 self.phase = Phase.OVER  # end game after both players have played
                 self.current_turn = None

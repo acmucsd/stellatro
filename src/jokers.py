@@ -532,6 +532,7 @@ class DiningHallPrices(Joker):
 #             self.card_table[(rank, suit)] = 5
 #         return chips + self.card_table[(rank, suit)], mult
 
+
 class HalfJoker(Joker):
     name = "Half Joker"
     description = "Add 20 to multiplier if played hand contains 3 or fewer cards."
@@ -541,14 +542,11 @@ class HalfJoker(Joker):
     ) -> Tuple[int, int]:
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
-        if hand_type in {
-            HandType.PAIR,
-            HandType.THREE_OF_A_KIND,
-            HandType.HIGH_CARD
-        }:
+        if hand_type in {HandType.PAIR, HandType.THREE_OF_A_KIND, HandType.HIGH_CARD}:
             return chips, mult + 20
         return chips, mult
-    
+
+
 # class FourFingers(Joker):
 #     name = "Four Fingers Joker"
 #     description = "All Flushes and Straights can be made with 4 cards."
@@ -589,6 +587,7 @@ class HalfJoker(Joker):
 #             return chips, mult + 20
 #         return chips, mult
 
+
 class Fibonacci(Joker):
     name = "Fibonacci Joker"
     description = "Each played Ace, 2, 3, 5, or 8 gives +8 Mult when scored."
@@ -600,7 +599,8 @@ class Fibonacci(Joker):
         if rank == 14 or rank == 2 or rank == 3 or rank == 5 or rank == 8:
             return chips, mult + 8
         return chips, mult
-    
+
+
 class ScaryFace(Joker):
     name = "Scary Face Joker"
     description = "Each face card gives +10 mult."
