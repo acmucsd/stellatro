@@ -9,7 +9,7 @@ from utils import print_card_list, print_jokers
 
 JOKER_POOL_SIZE = 15
 JOKER_HAND_SIZE = 2
-PLAYER_CARDS = 10
+PLAYER_CARDS = 8
 
 HAND_SCORES = {
     HandType.HIGH_CARD: (10, 1),
@@ -82,12 +82,12 @@ class Game:
         hand_type = checker.check()
 
         # debugging
-        print(hand_type)
-        print_card_list(hand)
-        print_jokers(jokers)
+        # print(hand_type)
+        # print_card_list(hand)
+        # print_jokers(jokers)
 
         chips, mult = HAND_SCORES.get(hand_type, (0, 0))
-        print(chips, mult)
+        # print(chips, mult)
         # apply each card-phase joker
 
         # for each card...

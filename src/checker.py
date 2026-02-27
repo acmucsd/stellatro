@@ -34,7 +34,7 @@ class Checker:
 
     def check(self) -> HandType:
         """
-        Given 5 cards, return hand name.
+        Given at most 5 cards, return hand name.
         """
         if len(self.hand) != 5:
             raise ValueError("Hand must contain exactly 5 cards to classify.")

@@ -18,10 +18,10 @@ class Deck:
         self.build_and_shuffle()
     def build_and_shuffle(self):
         """Standardizes deck creation and shuffling."""
-        self.cards = [
-            instantiate_card(self.bg_sheet, self.sheet, r, s, self.cardBackground) 
-            for s in SUITS for r in RANKS
-        ]
+        self.cards = []
+        for s in SUITS:
+            for r in RANKS.keys():
+                self.cards.append(instantiate_card(self.bg_sheet, self.sheet, r, s, self.cardBackground))
         random.shuffle(self.cards)
     def add_card(self, card):
         self.cards.append(card)

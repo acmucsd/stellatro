@@ -30,7 +30,7 @@ class Card(pygame.sprite.Sprite):
     num_triggers : int
     selected : bool = False
     
-    def __init__(self, card_background, rank, suit, front_image, back_image, x=0, y=0):
+    def __init__(self, card_background, rank, suit, front_image, back_image, x=0, y=0, lerp_speed = 20):
         super().__init__()
         self.card_background = card_background
         self.rank = rank
@@ -38,6 +38,7 @@ class Card(pygame.sprite.Sprite):
         self.scored = False
         self.num_triggers = 1
         self.selected = False
+        self.is_playing = False
         
         # Store both versions of the "Final" image
         self.face_up_image = back_image.copy()
@@ -52,6 +53,9 @@ class Card(pygame.sprite.Sprite):
         
         self.image = self.face_up_image
         self.rect = self.image.get_rect(topleft=(x, y))
+        self.target_pos = pygame.math.Vector2(self.rect.center)
+        self.lerp_speed= lerp_speed
+        
     def flip(self):
         """Toggles the card between face-up and face-down."""
         if self.face_down_image is None:
@@ -66,8 +70,14 @@ class Card(pygame.sprite.Sprite):
         # Re-center the rect in case images are slightly different sizes
         old_center = self.rect.center
         self.rect = self.image.get_rect(center=old_center)
-    
-    def update(self):
-        pass
+    def toggle_selection(self):
+        self.selected = not self.selected
+        
+    def update(self, dt):
+        curr_pos = pygame.math.Vector2(self.rect.center)
+        if curr_pos.distance_to(self.target_pos) > 1:
+            lerp = min(max(self.lerp_speed * dt,0),1)
+            new_pos = curr_pos.lerp(self.target_pos, lerp)
+            self.rect.center = (new_pos.x, new_pos.y)
 
         

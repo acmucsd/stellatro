@@ -9,9 +9,13 @@ from itertools import product
 from random import randint
 
 # Base class for jokers
-class Joker:
+class Joker(pygame.sprite.Sprite):
     name: str
     description: str
+    
+    def __init__(self):
+        super().__init__()
+        
 
     def pre_card_phase(self, hand: List[Card]) -> Tuple[List[Card]]:
         """Return (hand) after pre-phase application of joker."""

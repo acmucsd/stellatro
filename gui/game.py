@@ -59,10 +59,9 @@ class Game:
         self.bg_sheet = bg_sheet
         self.sheet = sheet
         self.cardBackground = cardBackground
-
-
-
-    def evaluate_hand(self, hand: List[Card], jokers: List[Joker]) -> int:
+        
+    # round score, chips, mult
+    def evaluate_hand(self, hand: List[Card], jokers: List[Joker]) -> (int, int, int) :
 
         # before we find out what hand we have, apply the pre-phase jokers
 
@@ -100,7 +99,7 @@ class Game:
         for joker in jokers:
             chips, mult = joker.post_card_phase(chips, mult, hand)
         print(chips, mult)
-        return chips * mult
+        return chips * mult, chips, mult
 
     def start_round(self):
         # start the game
@@ -110,8 +109,8 @@ class Game:
 
         # 1. generate deck for both players
         game_deck = Deck(bg_sheet=self.bg_sheet, sheet=self.sheet, cardBackground=self.cardBackground)
-        self.p1hand = game_deck.draw(10)
-        self.p2hand = game_deck.draw(10)
+        self.p1hand = game_deck.draw(8)
+        self.p2hand = game_deck.draw(8)
 
         # 2. generate jokers
         jokers = generate_jokers(JOKER_POOL_SIZE)
