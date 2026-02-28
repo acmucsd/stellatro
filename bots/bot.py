@@ -1,12 +1,13 @@
-class Bot():
+class Bot:
     def __init__(self):
         pass
 
-    def pick_joker(self, game_state):
-        # Placeholder for bot decision logic
-        return game_state["jokers"][0]
-    
-    def finalize_jokers(self):
-        # Placeholder for finalizing jokers
-        # return the best hand and the arranged jokers
-        return [], []
+    def pick_joker(self, state):
+        # Return the index of the joker to pick.
+        # Replace with smarter logic later.
+        return 0
+
+    def pick_hand(self, state):
+        # Return a list of 5 card indices to play.
+        # Replace with smarter logic later.
+        return [0, 1, 2, 3, 4]

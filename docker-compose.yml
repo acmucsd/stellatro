@@ -1,0 +1,38 @@
+services:
+  game:
+    build:
+      context: .
+      dockerfile: Dockerfile.game
+    container_name: stellatro-game
+    ports:
+      - "5000:5000"
+    networks:
+      - stellatro-net
+
+  bot1:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: stellatro-bot1
+    environment:
+      - PLAYER_ID=1
+    depends_on:
+      - game
+    networks:
+      - stellatro-net
+
+  bot2:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: stellatro-bot2
+    environment:
+      - PLAYER_ID=2
+    depends_on:
+      - game
+    networks:
+      - stellatro-net
+
+networks:
+  stellatro-net:
+    driver: bridge
