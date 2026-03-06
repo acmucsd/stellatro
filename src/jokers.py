@@ -3,7 +3,7 @@ from card import Card
 from typing import List, Tuple
 from checker import HandType
 from checker import Checker
-from card import Rank, Suit
+from card import Rank, Suit, SUITS
 from itertools import product
 from random import randint
 
@@ -246,10 +246,14 @@ class SpadeMultBoost(Joker):
         if suit == Suit.SPADE:
             return chips, mult + 2
         return chips, mult
-    
+
+
 class SpareTrousers(Joker):
     name = "Spare Trousers"
     description = "This joker gains +2 Mult if played hand contains a Two Pair (Currently +0 Mult)"
+
+    def __init__(self):
+        self.accumulated_mult = 0
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -258,17 +262,54 @@ class SpareTrousers(Joker):
             HandType.TWO_PAIR,
             HandType.FULL_HOUSE,
         }:
-            return chips, mult + 2
-        return chips, mult
-    
+            self.accumulated_mult += 2
+        return chips, mult + self.accumulated_mult
+
+
 class AncientJoker(Joker):
     name = "Ancient Joker"
     description = "Each played card with [suit] gives x1.5 Mult when scored. (suit changed at end of round)."
     
+    def __init__(self):
+        """Randomly choose a suit"""
+        self.active_suit = random.choice(SUITS)
+
+    def apply_card_phase(
+        self, chips: int, mult: int, rank: Rank, suit: Suit
+    ) -> Tuple[int, int]:
+        if suit == self.active_suit:
+            return chips, int(mult * 1.5)
+        return chips, mult
+    
+    def change_suit(self):
+        """Call this function to change the active suit"""
+        self.active_suit = random.choice(SUITS)
+
+
+class WalkieTalkie(Joker):
+    name = "Walkie Talkie"
+    description = "Each played 10 or 4 gives +10 Chips and +4 Mult when scored."
+
+    def apply_card_phase(self, chips, mult, rank, suit):
+        if rank == Rank.TEN or rank == Rank.FOUR:
+            return chips + 10, mult + 4
+        return chips, mult
+
+
+class Ramen(Joker):
+    name = "Ramen"
+    description = "X2 Mult, loses X0.01 Mult per card discarded."
+    
+    def __init__(self):
+        self.mult_multiplier = 2.0
+    
     def post_card_phase(self, chips, mult, hand):
-        Checker_instance = Checker(hand)
-        hand_type = Checker_instance.check()
-        pass # TODO: Implement
+        return chips, (mult * self.mult_multiplier)
+    
+    def discard(self, num_discarded):
+        """Call this function when cards are discarded"""
+        self.mult_multiplier -= (0.01 * num_discarded)
+        self.mult_multiplier = max(0, self.mult_multiplier)
 
 
 class PhotoGraphMultBoost(Joker):
@@ -659,6 +700,9 @@ def generate_jokers(num_jokers: int) -> List[Joker]:
         HalfJoker(),
         Fibonacci(),
         ScaryFace(),
+        # SpareTrousers(),
+        # AncientJoker(),
+        # WalkieTalkie(),
     ]
 
     toReturn = []
