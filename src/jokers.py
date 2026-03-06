@@ -342,6 +342,26 @@ class SockAndBuskin(Joker):
         return hand
 
 
+class SunGod(Joker):
+    name= "Sun God"
+    description = "For every heart card played, get X1.5 Mult"
+
+    def apply_card_phase(self, chips, mult, rank, suit):
+        if suit == Suit.HEART:
+            return chips, mult * 1.5
+        return chips, mult
+
+
+class EigthCollege(Joker):
+    name = "Eigth College"
+    description = "Each played 8 gives +8 chips and +8 Mult when scored"
+
+    def apply_card_phase(self, chips, mult, rank, suit):
+        if suit == Rank.EIGHT:
+            return chips + 8, mult + 8
+        return chips, mult
+
+
 class PhotoGraphMultBoost(Joker):
     name = "PhotoGraph Joker"
     description = "First played face card gives X2 Mult when scored"
