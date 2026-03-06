@@ -312,6 +312,36 @@ class Ramen(Joker):
         self.mult_multiplier = max(0, self.mult_multiplier)
 
 
+class Seltzer(Joker):
+    name = "Seltzer"
+    description = "Retrigger all cards played for the next 10 hands."
+
+    def __init__(self):
+        self.hands_remaining = 10
+
+    def pre_card_phase(self, hand: List[Card]) -> List[Card]:
+        if self.hands_remaining > 0:
+            for card in hand:
+                card.add_trigger()
+        return hand
+
+    def decrement_hand(self):
+        """Call this at the end of each hand played."""
+        if self.hands_remaining > 0:
+            self.hands_remaining -= 1
+
+
+class SockAndBuskin(Joker):
+    name = "Sock and Buskin"
+    description = "Retrigger all played face cards."
+
+    def pre_card_phase(self, hand: List[Card]) -> List[Card]:
+        for card in hand:
+            if card.rank in {11, 12, 13}:
+                card.add_trigger()
+        return hand
+
+
 class PhotoGraphMultBoost(Joker):
     name = "PhotoGraph Joker"
     description = "First played face card gives X2 Mult when scored"
@@ -703,6 +733,8 @@ def generate_jokers(num_jokers: int) -> List[Joker]:
         # SpareTrousers(),
         # AncientJoker(),
         # WalkieTalkie(),
+        # Ramen(),
+        # Seltzer(),
     ]
 
     toReturn = []
