@@ -295,7 +295,8 @@ class WalkieTalkie(Joker):
         if rank == Rank.TEN or rank == Rank.FOUR:
             return chips + 10, mult + 4
         return chips, mult
-    
+
+
 class Ramen(Joker):
     name = "Ramen"
     description = "X2 Mult, loses X0.01 Mult per card discarded."
