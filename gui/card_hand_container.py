@@ -21,8 +21,14 @@ class CardHandContainer(pygame.sprite.Group):
         if not sprites:
             return
 
-        # Use the first sprite's width as the standard for this container
-        card_w = sprites[0].rect.width
+        # Use the first sprite's original width as the standard for this container.
+        # This prevents layout issues when sprites are rotated (e.g. Joker shake)
+        # and their bounding box changes.
+        first_sprite = sprites[0]
+        if hasattr(first_sprite, 'original_image'): # Joker
+            card_w = first_sprite.original_image.get_width()
+        else: # Card or other sprite
+            card_w = first_sprite.rect.width
         
         # Calculate the total width of the hand including spacing
         # Total width = (all cards) + (all gaps between them)

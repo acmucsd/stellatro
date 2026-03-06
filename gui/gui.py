@@ -5,7 +5,6 @@ from card import Card,CardBackground
 from rank import Rank, RANKS
 from suit import Suit
 from deck import Deck
-from jokers import JokerSprite
 from utils import get_assets_path, getCardImage,instantiate_card, getHandTypeStr
 from game import Game, Phase, PlayerTurn, HAND_SCORES
 from card_hand_container import CardHandContainer
@@ -17,13 +16,11 @@ from checker import Checker
 
 # 1. Setup
 pygame.init()
-screen = pygame.display.set_mode((1000, 700))
+screen = pygame.display.set_mode((1080, 720))
 clock = pygame.time.Clock()
 running = True
 
-# Card Background Sprite Sheets
-card_background_img = pygame.image.load(get_assets_path('CardBackgrounds.png'))
-card_bg_spritesheet = SpriteSheet(card_background_img)
+
 # Front Card Sprite Sheets
 playing_cards_img = pygame.image.load(get_assets_path('PlayingCards.png'))
 playing_cards_spritesheet = SpriteSheet(playing_cards_img)
@@ -69,11 +66,14 @@ selected_card_indices = []
 player_hand = CardHandContainer(Vector2(screen.get_size()[0] / 2,screen.get_size()[1] / 2 + 50),5.0)
 player_playing_hand = CardHandContainer(Vector2(screen.get_size()[0] / 2,screen.get_size()[1] / 2 - 50),5.0)
 
-game = Game(card_bg_spritesheet,playing_cards_spritesheet,CardBackground.WHITE_FRONT)
+game = Game(playing_cards_spritesheet,CardBackground.WHITE_FRONT)
 game.start_round()
 
-for j in game.jokers:
-    joker_pool.add(j)
+#it is possible to get duplicate sprites
+game.jokers = [type(j)() for j in game.jokers]
+joker_pool.add(game.jokers)
+
+
 
 initial_state = game.get_game_state()
 for card in initial_state.player1_hand:
@@ -131,8 +131,9 @@ def onP1Play():
    
     
     
-    
-
+shakeTimer = 0
+shakeTime = 1
+joker_idx = 0
 # 2. Main Game Loop
 while running:
     delta = clock.tick(120) / 1000.0
@@ -200,9 +201,15 @@ while running:
                 
     # 3. Game Logic (update positions, etc.)
     player_hand.update(delta)
+    joker_pool.update(delta)
     player_playing_hand.update(delta)
     play_button.update(pygame.mouse.get_pos())
     
+    shakeTimer += delta
+    if shakeTimer >= shakeTime:
+        joker_pool.sprites()[joker_idx].shake()
+        joker_idx = (joker_idx + 1) % len(joker_pool)
+        shakeTimer = 0
 
    
 

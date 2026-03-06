@@ -11,8 +11,7 @@ from utils import instantiate_card
 
 
 class Deck:
-    def __init__(self, bg_sheet, sheet, cardBackground : CardBackground):
-        self.bg_sheet = bg_sheet
+    def __init__(self, sheet, cardBackground : CardBackground):
         self.sheet = sheet
         self.cardBackground = cardBackground
         self.build_and_shuffle()
@@ -21,7 +20,7 @@ class Deck:
         self.cards = []
         for s in SUITS:
             for r in RANKS.keys():
-                self.cards.append(instantiate_card(self.bg_sheet, self.sheet, r, s, self.cardBackground))
+                self.cards.append(instantiate_card(self.sheet, r, s, self.cardBackground))
         random.shuffle(self.cards)
     def add_card(self, card):
         self.cards.append(card)

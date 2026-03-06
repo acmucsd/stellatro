@@ -1,9 +1,10 @@
 import os
-from rank import Rank
+from rank import Rank, RANKS
 from suit import Suit
 from card import Card, CardBackground
 from spritesheet import SpriteSheet
 from checker import HandType
+import pygame
 
 
 GUI_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -12,7 +13,40 @@ ASSETS_DIR = os.path.join(GUI_DIR,"../assets")
 def get_assets_path(asset_file_name):
     return os.path.join(ASSETS_DIR,asset_file_name)
 
-def instantiate_card(bg_sheet, sheet,rank: str, suit: Suit, background: CardBackground, x=0, y=0):
+BALATRO_CARD_IMAGE_URL_TABLE = {}
+
+def _initialize_balatro_card_image_table():
+    """
+    Populates the BALATRO_CARD_IMAGE_URL_TABLE with mappings from (rank, suit)
+    to the corresponding image file path based on the asset naming convention.
+    0-12: Hearts (2-A)
+    13-25: Clubs (2-A)
+    26-38: Diamonds (2-A)
+    39-51: Spades (2-A)
+    """
+    ranks_in_order = sorted(list(RANKS.keys())) # [2, 3, ..., 14]
+
+    suit_base_indices = {
+        Suit.HEART: 0,
+        Suit.CLUB: 13,
+        Suit.DIAMOND: 26,
+        Suit.SPADE: 39,
+    }
+
+    for suit, base_index in suit_base_indices.items():
+        for i, rank in enumerate(ranks_in_order):
+            image_index = base_index + i
+            BALATRO_CARD_IMAGE_URL_TABLE[(rank, suit)] = f"balatro_playing_cards/balatro_playing_cards_{image_index}.png"
+
+_initialize_balatro_card_image_table()
+
+# Card Background Sprite Sheets
+card_back_img = pygame.image.load(get_assets_path('balatro_card_backgrounds/card_background_0.png'))
+white_front_img = pygame.image.load(get_assets_path('balatro_card_backgrounds/card_background_1.png'))
+CARD_SCALE = 0.7
+card_back_image = pygame.transform.smoothscale(card_back_img, (card_back_img.get_width() * CARD_SCALE, card_back_img.get_height() * CARD_SCALE) )
+white_front_image = pygame.transform.smoothscale(white_front_img, (white_front_img.get_width() * CARD_SCALE, white_front_img.get_height() * CARD_SCALE) )
+def instantiate_card(sheet,rank: str, suit: Suit, background: CardBackground, x=0, y=0):
     if rank == "J":
         rank = 11
     elif rank == "Q":
@@ -23,20 +57,16 @@ def instantiate_card(bg_sheet, sheet,rank: str, suit: Suit, background: CardBack
         rank = 14
     else:
         rank = int(rank)
-    back_image = getCardBackgroundImage(bg_sheet,CardBackground.WHITE_FRONT)
+    
     front_image = getCardImage(sheet, rank, suit)
-    back_base = getCardBackgroundImage(bg_sheet, CardBackground.RED)
-    new_card = Card(background, rank, suit, front_image,back_image, x, y)
-    new_card.face_down_image = back_base
+
+    new_card = Card(background, rank, suit, front_image,white_front_image, x, y)
+    new_card.face_down_image = card_back_image
     return new_card
-def getCardBackgroundImage(sheet: SpriteSheet, background: CardBackground):
-    # Using the dimensions (69, 93) from your previous frame_0 logic
-    row =0
-    col = 0
-    if background == CardBackground.WHITE_FRONT:
-        row = 0
-        col = 1
-    return sheet.get_image(row, col, 70, 94, 0.7, (255, 255, 255),1,0)
+
+def instantiate_joker(sheet, joker):
+    pass
+
 
 def getCardImage(sheet : SpriteSheet, rank : Rank , suit : Suit):
     if suit == Suit.HEART:
@@ -48,7 +78,7 @@ def getCardImage(sheet : SpriteSheet, rank : Rank , suit : Suit):
     elif suit == Suit.SPADE:
         row = 3
     col = rank - 2
-    return sheet.get_image(row,col,70,94,0.7,(255,255,255),1,1)
+    return sheet.get_image(row,col,70,94,CARD_SCALE,(255,255,255),1,1)
 def getHandTypeStr(hand_type : HandType):
     if hand_type == HandType.HIGH_CARD:
         return "High Card"

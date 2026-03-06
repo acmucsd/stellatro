@@ -1,5 +1,6 @@
 import random
 import pygame
+import math
 from card import Card
 from typing import List, Tuple
 from checker import Checker, HandType
@@ -7,15 +8,71 @@ from rank import Rank
 from suit import Suit
 from itertools import product
 from random import randint
+from utils import get_assets_path
+
+#key : imageUrl, value: pygame.Surface
+JOKER_IMAGE_TABLE = {}
 
 # Base class for jokers
 class Joker(pygame.sprite.Sprite):
     name: str
     description: str
+    imageUrl : str
     
     def __init__(self):
         super().__init__()
+        if self.imageUrl not in JOKER_IMAGE_TABLE:
+            img_path = get_assets_path(self.imageUrl)
+            # Using .convert_alpha() is good practice for performance with transparent images
+            JOKER_IMAGE_TABLE[self.imageUrl] = pygame.image.load(img_path).convert_alpha()
         
+        self.original_image = JOKER_IMAGE_TABLE[self.imageUrl]
+        self.image = self.original_image.copy()
+        self.rect = self.image.get_rect(topleft=(0, 0))
+        self.target_pos = pygame.math.Vector2(self.rect.center)
+        self.lerp_speed= 20
+        self.selected = False
+
+        # Shake animation attributes
+        self.is_shaking = False
+        self.shake_timer = 0.0
+        self.shake_duration = 0.3  # seconds
+        self.shake_angle = 15      # degrees
+    
+    def update(self, dt):
+        # Position interpolation
+        curr_pos = pygame.math.Vector2(self.rect.center)
+        if curr_pos.distance_to(self.target_pos) > 1:
+            lerp = min(max(self.lerp_speed * dt,0),1)
+            new_pos = curr_pos.lerp(self.target_pos, lerp)
+            self.rect.center = (new_pos.x, new_pos.y)
+
+        # Shake animation
+        if self.is_shaking:
+            center = self.rect.center # Save center before rotation changes rect size
+            self.shake_timer += dt
+            if self.shake_timer >= self.shake_duration:
+                self.is_shaking = False
+                self.shake_timer = 0.0
+                # Restore original image and position
+                self.image = self.original_image.copy()
+                self.rect = self.image.get_rect(center=center)
+            else:
+                progress = self.shake_timer / self.shake_duration
+                # A sine wave for rotation angle. pi*4 gives two full shakes.
+                angle = self.shake_angle * math.sin(progress * math.pi * 4)
+                
+                # Rotate from original image to avoid quality degradation
+                self.image = pygame.transform.rotate(self.original_image, angle)
+                self.rect = self.image.get_rect(center=center)
+
+    def shake(self):
+        if not self.is_shaking:
+            self.is_shaking = True
+            self.shake_timer = 0.0
+        else:
+            self.shake_timer = 0.0
+
 
     def pre_card_phase(self, hand: List[Card]) -> Tuple[List[Card]]:
         """Return (hand) after pre-phase application of joker."""
@@ -37,42 +94,30 @@ class Joker(pygame.sprite.Sprite):
         return self.name + ": " + self.description
 
 
-class JokerSprite(pygame.sprite.Sprite):
-    def __init__(self, joker : Joker, image, x=0, y=0):
-        super().__init__()
-        self.joker = joker
-        self.image = image
-        self.rect = self.image.get_rect(topleft=(x, y))
-
-
 class RegularJoker(Joker):
     name = "Regular Joker"
     description = "No special abilities."
-
-
+    imageUrl = "balatro_jokers/balatro_jokers_0.png"
+    
 class PairMultBoost(Joker):
     name = "Jolly Joker"
     description = "Boost multiplier by 3 if the hand includes Pair."
+    imageUrl = "balatro_jokers/balatro_jokers_1.png"
 
-    def post_card_phase(
-        self, chips: int, mult: int, hand: List[Card]
-    ) -> Tuple[int, int]:
+    def post_card_phase(self, chips: int, mult: int, hand: List[Card]) -> Tuple[int, int]:
         Checker_instance = Checker(hand)
         hand_type = Checker_instance.check()
-        if hand_type in {
-            HandType.PAIR,
-            HandType.TWO_PAIR,
-            HandType.THREE_OF_A_KIND,
-            HandType.FULL_HOUSE,
-            HandType.FOUR_OF_A_KIND,
-        }:
+        if hand_type in {HandType.PAIR,HandType.TWO_PAIR,HandType.THREE_OF_A_KIND,HandType.FULL_HOUSE,HandType.FOUR_OF_A_KIND,}:
             return chips, mult + 3
         return chips, mult
+
+
 
 
 class PairChipBoost(Joker):
     name = "Sly Joker"
     description = "Add 10 chips if the hand includes Pair."
+    imageUrl = "balatro_jokers/balatro_jokers_2.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -91,6 +136,7 @@ class PairChipBoost(Joker):
 class TripletMultBoost(Joker):
     name = "Zany Joker"
     description = "Boost multiplier by 5 if the hand includes Three of a Kind."
+    imageUrl = "balatro_jokers/balatro_jokers_3.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -107,6 +153,7 @@ class TripletMultBoost(Joker):
 class TwoPairMultBoost(Joker):
     name = "Cheeky Joker"
     description = "Boost multiplier by 4 if the hand includes Two Pair."
+    imageUrl = "balatro_jokers/balatro_jokers_4.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -123,6 +170,7 @@ class TwoPairMultBoost(Joker):
 class StraightMultBoost(Joker):
     name = "Witty Joker"
     description = "Boost multiplier by 6 if the hand includes Straight."
+    imageUrl = "balatro_jokers/balatro_jokers_5.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -138,6 +186,7 @@ class StraightMultBoost(Joker):
 class FlushMultBoost(Joker):
     name = "Daring Joker"
     description = "Boost multiplier by 7 if the hand includes Flush."
+    imageUrl = "balatro_jokers/balatro_jokers_6.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -153,6 +202,7 @@ class FlushMultBoost(Joker):
 class TripletChipBoost(Joker):
     name = "Merry Joker"
     description = "Add 15 chips if the hand includes Three of a Kind."
+    imageUrl = "balatro_jokers/balatro_jokers_7.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -169,6 +219,7 @@ class TripletChipBoost(Joker):
 class TwoPairChipBoost(Joker):
     name = "Jovial Joker"
     description = "Add 12 chips if the hand includes Two Pair."
+    imageUrl = "balatro_jokers/balatro_jokers_8.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -185,6 +236,7 @@ class TwoPairChipBoost(Joker):
 class StraightChipBoost(Joker):
     name = "Lively Joker"
     description = "Add 20 chips if the hand includes Straight."
+    imageUrl = "balatro_jokers/balatro_jokers_9.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -200,6 +252,7 @@ class StraightChipBoost(Joker):
 class FlushChipBoost(Joker):
     name = "Vibrant Joker"
     description = "Add 25 chips if the hand includes Flush."
+    imageUrl = "balatro_jokers/balatro_jokers_10.png" # Added
 
     def post_card_phase(self, chips, mult, hand):
         Checker_instance = Checker(hand)
@@ -215,6 +268,7 @@ class FlushChipBoost(Joker):
 class DiamondMultBoost(Joker):
     name = "Diamond Joker"
     description = "Played cards with Diamond suit boost multiplier by 2."
+    imageUrl = "balatro_jokers/balatro_jokers_11.png" # Added
 
     def apply_card_phase(
         self, chips: int, mult: int, rank: Rank, suit: Suit
@@ -227,6 +281,7 @@ class DiamondMultBoost(Joker):
 class HeartMultBoost(Joker):
     name = "Heart Joker"
     description = "Played cards with Heart suit boost multiplier by 2."
+    imageUrl = "balatro_jokers/balatro_jokers_12.png" # Added
 
     def apply_card_phase(
         self, chips: int, mult: int, rank: Rank, suit: Suit
@@ -239,6 +294,7 @@ class HeartMultBoost(Joker):
 class ClubMultBoost(Joker):
     name = "Club Joker"
     description = "Played cards with Club suit boost multiplier by 2."
+    imageUrl = "balatro_jokers/balatro_jokers_13.png" # Added
 
     def apply_card_phase(
         self, chips: int, mult: int, rank: Rank, suit: Suit
@@ -251,6 +307,7 @@ class ClubMultBoost(Joker):
 class SpadeMultBoost(Joker):
     name = "Spade Joker"
     description = "Played cards with Spade suit boost multiplier by 2."
+    imageUrl = "balatro_jokers/balatro_jokers_14.png" # Added
 
     def apply_card_phase(
         self, chips: int, mult: int, rank: Rank, suit: Suit

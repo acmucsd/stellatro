@@ -45,7 +45,7 @@ class GameState:
 
 
 class Game:
-    def __init__(self, bg_sheet,sheet,cardBackground):
+    def __init__(self, sheet,cardBackground):
         self.player1_score = 0
         self.player2_score = 0
         self.phase = Phase.DRAFT
@@ -56,7 +56,6 @@ class Game:
         self.p1jokers = []
         self.p2jokers = []
         self.current_turn = PlayerTurn.PLAYER1
-        self.bg_sheet = bg_sheet
         self.sheet = sheet
         self.cardBackground = cardBackground
         
@@ -108,7 +107,7 @@ class Game:
         # Placeholder for game logic
 
         # 1. generate deck for both players
-        game_deck = Deck(bg_sheet=self.bg_sheet, sheet=self.sheet, cardBackground=self.cardBackground)
+        game_deck = Deck( sheet=self.sheet, cardBackground=self.cardBackground)
         self.p1hand = game_deck.draw(8)
         self.p2hand = game_deck.draw(8)
 
